@@ -1,6 +1,7 @@
 package benchmarkgame;
 
 import benchmarkgame.gameutils.Command;
+import benchmarkgame.gameutils.LocPair;
 import benchmarkgame.gameutils.Move;
 import benchmarkgame.gameutils.Status;
 import java.io.BufferedReader;
@@ -79,104 +80,93 @@ class Handler implements Runnable {
 
     public void cmdMove(String clientID, Move direction) throws IOException {
         
-        String ret,
-               serverMessage;
+        LocPair ret, currentPos, initialPos;
+        String serverMessage;
+        
+        currentPos = s.getCurrentPosition(clientID);
+        initialPos = new LocPair(-2, -2);
+        initialPos.x = currentPos.x;
+        initialPos.y = currentPos.y;
 
         switch(direction) {
             case UP:
                 ret = s.updatePosition(clientID, 0, 1);
-                if (ret != clientID){                   //there's a player in the place I want to go,
-                    cmdMove(ret, "LEFT");               //so move the player to the left
-                    s.updatePosition(clientID, 0, 1);   //so I can go up.
-                    serverMessage = "The player's movement stimulated the movement of others." + clientID;
+                if (ret == initialPos){                   
+                    serverMessage = "You could not make the move, " + clientID; 
                     sendMessage(serverMessage);
-                } else {
-                    serverMessage = "Move successful. " + clientID;
-                    sendMessage(serverMessage);
+                } else {                                
+                    serverMessage = "Move successful. " + clientID + ", your new position is: (" + ret.x + ", " + ret.y + ").";
+                    sendMessage(serverMessage);         
                 }
                 break;
             case DOWN:
                 ret = s.updatePosition(clientID, 0, -1);
-                if (ret != clientID){                   //there's a player in the place I want to go,
-                    cmdMove(ret, "RIGHT");              //so move the player to the right
-                    s.updatePosition(clientID, 0, -1);  //so I can go down.
-                    serverMessage = "The player's movement stimulated the movement of others." + clientID;
+                if (ret == initialPos){                   
+                    serverMessage = "You could not make the move, " + clientID; 
                     sendMessage(serverMessage);
-                } else {
-                    serverMessage = "Move successful. " + clientID;
-                    sendMessage(serverMessage);
+                } else {                                
+                    serverMessage = "Move successful. " + clientID + ", your new position is: (" + ret.x + ", " + ret.y + ").";
+                    sendMessage(serverMessage);         
                 }
                 break;
             case RIGHT:
                 ret = s.updatePosition(clientID, 1, 0);
-                if (ret != clientID){                   //there's a player in the place I want to go,
-                    cmdMove(ret, "UP");                 //so move the player up
-                    s.updatePosition(clientID, 1, 0);   //so I can go to the right.
-                    serverMessage = "The player's movement stimulated the movement of others." + clientID;
+                if (ret == initialPos){                   
+                    serverMessage = "You could not make the move, " + clientID; 
                     sendMessage(serverMessage);
-                } else {
-                    serverMessage = "Move successful. " + clientID;
-                    sendMessage(serverMessage);
+                } else {                                
+                    serverMessage = "Move successful. " + clientID + ", your new position is: (" + ret.x + ", " + ret.y + ").";
+                    sendMessage(serverMessage);         
                 }
                 break;
             case LEFT:
                 ret = s.updatePosition(clientID, -1, 0);
-                if (ret != clientID){                   //there's a player in the place I want to go,
-                    cmdMove(ret, "DOWN");               //so move the player down
-                    s.updatePosition(clientID, -1, 0);  //so I can go to the left.
-                    serverMessage = "The player's movement stimulated the movement of others." + clientID;
+                if (ret == initialPos){                   
+                    serverMessage = "You could not make the move, " + clientID; 
                     sendMessage(serverMessage);
-                } else {
-                    serverMessage = "Move successful. " + clientID;
-                    sendMessage(serverMessage);
+                } else {                                
+                    serverMessage = "Move successful. " + clientID + ", your new position is: (" + ret.x + ", " + ret.y + ").";
+                    sendMessage(serverMessage);         
                 }
                 break;
             case UR:
                 ret = s.updatePosition(clientID, 1, 1);
-                if (ret != clientID){                   //there's a player in the place I want to go,
-                    cmdMove(ret, "RIGHT");              //so move the player to the right
-                    s.updatePosition(clientID, 1, 1);   //so I can go up-right.
-                    serverMessage = "The player's movement stimulated the movement of others." + clientID;
+                if (ret == initialPos){                   
+                    serverMessage = "You could not make the move, " + clientID; 
                     sendMessage(serverMessage);
-                } else {
-                    serverMessage = "Move successful. " + clientID;
-                    sendMessage(serverMessage);
+                } else {                                
+                    serverMessage = "Move successful. " + clientID + ", your new position is: (" + ret.x + ", " + ret.y + ").";
+                    sendMessage(serverMessage);         
                 }
                 break;
             case UL:
                 ret = s.updatePosition(clientID, -1, 1);
-                if (ret != clientID){                   //there's a player in the place I want to go,
-                    cmdMove(ret, "LEFT");               //so move the player to the left
-                    s.updatePosition(clientID, -1, 1);  //so I can go up-left.
-                    serverMessage = "The player's movement stimulated the movement of others." + clientID;
+                if (ret != initialPos){                   
+                    serverMessage = "Move successful. " + clientID + ", your new position is: (" + ret.x + ", " + ret.y + ").";
                     sendMessage(serverMessage);
-                } else {
-                    serverMessage = "Move successful. " + clientID;
-                    sendMessage(serverMessage);
+                } else {                                
+                    serverMessage = "You could not make the move, " + clientID; 
+                    sendMessage(serverMessage);         
                 }
                 break;
             case DR:
                 ret = s.updatePosition(clientID, 1, -1);
-                if (ret != clientID){                   //there's a player in the place I want to go,
-                    cmdMove(ret, "RIGHT");              //so move the player to the right
-                    s.updatePosition(clientID, 1, -1);  //so I can go down-right.
-                    serverMessage = "The player's movement stimulated the movement of others." + clientID;
+                if (ret == initialPos){                   
+                    serverMessage = "You could not make the move, " + clientID; 
                     sendMessage(serverMessage);
-                } else {
-                    serverMessage = "Move successful. " + clientID;
-                    sendMessage(serverMessage);
+                } else {                                
+                    serverMessage = "Move successful. " + clientID + ", your new position is: (" + ret.x + ", " + ret.y + ").";
+                    sendMessage(serverMessage);         
                 }
                 break;
             case DL:
                 ret = s.updatePosition(clientID, -1, -1);
-                if (ret != clientID){                   //there's a player in the place I want to go,
-                    cmdMove(ret, "LEFT");               //so move the player to the left
-                    s.updatePosition(clientID, -1, -1); //so I can go down-left.
-                    serverMessage = "The player's movement stimulated the movement of others." + clientID;
+                if (ret == initialPos){                   
+                    serverMessage = "You could not make the move, " + clientID; 
                     sendMessage(serverMessage);
-                } else {
-                    serverMessage = "Move successful. " + clientID;
-                    sendMessage(serverMessage);
+                } else {                                
+                    serverMessage = "Move successful. " + clientID + ", your new position is: (" + ret.x + ", " + ret.y + ").";
+                    sendMessage(serverMessage);         
                 }
                 break;
             default:
@@ -187,6 +177,7 @@ class Handler implements Runnable {
     }
     
     private void cmdMove(String clientID, String a) throws IOException {
+        //System.out.println("entrei na função!!! " + clientID);
         cmdMove(clientID, Move.valueOf(a));
     }
         

@@ -17,5 +17,9 @@ public class LocPair {
         this.x = _x;
         this.y = _y;
     }
+
+    public boolean compare(LocPair other){
+    	return (this.x == other.x && this.y == other.y);
+    }
     
 }

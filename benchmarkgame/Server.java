@@ -134,13 +134,22 @@ public class Server {
      * @param clientID Player identification.
      * @param x Change in the direction x.
      * @param y Change in the direction y.
-     * @return Status Enum status describing the success or fail of operation.
+     * @return LocPair, the coordinate of the current position of the client in the game map.
      */
-    public String updatePosition(String clientID, int x, int y) {
-        LocPair pos = currentPosition.get(clientID);
+    public LocPair updatePosition(String clientID, int x, int y) {
+        int[] displacement = {-1, 0, 1}; 
+        LocPair ret, wantedPos, otherClientNextPos, change;
+        LocPair current_pos = currentPosition.get(clientID);
+        String otherClientID;
+
+        //otherClientNextPos = current_pos; voce esta apontando pro mesmo lugar!!!!!!!!! NÃO É UMA CÓPIA
+        wantedPos = new LocPair(-2, -2);
+        change = new LocPair(-2, -2);
+        otherClientNextPos = new LocPair(-2, -2);
+
         // checking future position
-        x += pos.x;
-        y += pos.y;
+        x += current_pos.x;
+        y += current_pos.y;
         
         //making the matrix become "circular"
         if (x >= boardSide){
@@ -154,26 +163,82 @@ public class Server {
         } else if (y < 0) {
         	y += boardSide;
         }
-        
+
         //updating the game map if the position is free
         synchronized (MAP) {
             switch(MAP[x][y]) {
                 case "free":
                     // update game map
                     MAP[x][y] = clientID;
-                    MAP[pos.x][pos.y] = "free";
+                    MAP[current_pos.x][current_pos.y] = "free";
 
                     // update hashmap pos reference
-                    pos.x = x;
-                    pos.y = y;
-                    return clientID;
+                    current_pos.x = x;
+                    current_pos.y = y;
+                    return current_pos;
+                
                 default:
-                    return MAP[x][y]; // if the position in the game map is not free, 
-                                      // the ID of the player that is there is returned
+                    wantedPos.x = x;
+                    wantedPos.y = y;
+    
+                    otherClientID = MAP[x][y]; //gets the ID of the player who is occupying 
+                                               //the place for which the first wanted to move
+                    otherClientNextPos.x = x;
+                    otherClientNextPos.y = y;
+                
+                    //finds a new position to the other client
+                    while(otherClientNextPos.compare(wantedPos) || otherClientNextPos.compare(current_pos)){
+                        //System.out.println("UP-sync WHILE");
+                        change.x = displacement[randomNumber.nextInt(3)];
+                        change.y = displacement[randomNumber.nextInt(3)];
+                        otherClientNextPos.x = wantedPos.x + change.x;
+                        otherClientNextPos.y = wantedPos.y + change.y;
+                    }
+
+                    //moves the other client
+                    ret = updatePosition(otherClientID, change.x, change.y);
+
+                    if (otherClientNextPos.x >= boardSide){
+                        otherClientNextPos.x -= boardSide;
+                    } else if (otherClientNextPos.x < 0) {
+                        otherClientNextPos.x += boardSide; 
+                    }
+
+                    if (otherClientNextPos.y >= boardSide){
+                        otherClientNextPos.y -= boardSide;
+                    } else if (otherClientNextPos.y < 0) {
+                        otherClientNextPos.y += boardSide;
+                    }
+                    
+                    //if it works, I know that the wanted position is now available 
+                    //and the client can move to the wanted position
+                    if(ret.compare(otherClientNextPos)){
+                        // update game map
+                        MAP[x][y] = clientID;
+                        MAP[current_pos.x][current_pos.y] = "free";
+
+                        // update hashmap pos reference
+                        current_pos.x = x;
+                        current_pos.y = y;
+                        return current_pos; 
+                    }
+
+                    return current_pos; // if it not works,  
+                                        // the client's original position is returned
             }
         }
     }
     
+    /**
+     * Returns the current position of the requested client.
+     *
+     * @param clientID Player identification.
+     * @return LocPair, a reference to the coordinate of the current position of the customer in the game map
+     */
+    public LocPair getCurrentPosition(String clientID){
+        return currentPosition.get(clientID);
+    }
+
     @Override
     public String toString(){
         String out = "";
