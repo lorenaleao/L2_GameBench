@@ -142,7 +142,6 @@ public class Server {
         LocPair current_pos = currentPosition.get(clientID);
         String otherClientID;
 
-        //otherClientNextPos = current_pos; voce esta apontando pro mesmo lugar!!!!!!!!! NÃO É UMA CÓPIA
         wantedPos = new LocPair(-2, -2);
         change = new LocPair(-2, -2);
         otherClientNextPos = new LocPair(-2, -2);
@@ -188,7 +187,6 @@ public class Server {
                 
                     //finds a new position to the other client
                     while(otherClientNextPos.compare(wantedPos) || otherClientNextPos.compare(current_pos)){
-                        //System.out.println("UP-sync WHILE");
                         change.x = displacement[randomNumber.nextInt(3)];
                         change.y = displacement[randomNumber.nextInt(3)];
                         otherClientNextPos.x = wantedPos.x + change.x;
